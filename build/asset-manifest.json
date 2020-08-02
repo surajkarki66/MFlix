@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/static/css/main.2637239d.chunk.css",
+    "main.js": "/static/js/main.de4ec786.chunk.js",
+    "main.js.map": "/static/js/main.de4ec786.chunk.js.map",
+    "runtime~main.js": "/static/js/runtime~main.a8a9905a.js",
+    "runtime~main.js.map": "/static/js/runtime~main.a8a9905a.js.map",
+    "static/js/2.dc8c00c7.chunk.js": "/static/js/2.dc8c00c7.chunk.js",
+    "static/js/2.dc8c00c7.chunk.js.map": "/static/js/2.dc8c00c7.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.6ccc5d9cf53e6be4b234d7a437bb9000.js": "/precache-manifest.6ccc5d9cf53e6be4b234d7a437bb9000.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/main.2637239d.chunk.css.map": "/static/css/main.2637239d.chunk.css.map",
+    "static/media/mongoleaf.png": "/static/media/mongoleaf.0ebc1843.png",
+    "static/media/pixelatedLeaf.svg": "/static/media/pixelatedLeaf.6c93bd20.svg"
+  }
+}
