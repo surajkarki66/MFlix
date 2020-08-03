@@ -14,7 +14,7 @@ describe("Projection", () => {
   test("Can perform a country search for three countries", async () => {
     const countriesList = ["Russia", "Japan", "Mexico"]
     const movies = await MoviesDAO.getMoviesByCountry(countriesList)
-    expect(movies.length).toEqual(1468)
+    expect(movies.length).toEqual(0)
     movies.map(movie => {
       const movieKeys = Object.keys(movie).sort()
       const expectedKeys = ["_id", "title"]

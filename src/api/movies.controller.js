@@ -15,7 +15,7 @@ export default class MoviesController {
   }
 
   static async apiGetMoviesByCountry(req, res, next) {
-    let countries = req.query.countries == "" ? "USA" : req.query.countries
+    let countries = req.query.countries === "" ? "USA" : req.query.countries
     let countryList = Array.isArray(countries) ? countries : Array(countries)
     let moviesList = await MoviesDAO.getMoviesByCountry(countryList)
     let response = {
