@@ -300,7 +300,6 @@ export default class MoviesDAO {
             from: "comments",
             let: { id: "$_id" },
             pipeline: [
-              { $sort: { date: -1 } },
               {
                 $match: {
                   $expr: {
@@ -308,6 +307,7 @@ export default class MoviesDAO {
                   },
                 },
               },
+              { $sort: { date: -1 } },
             ],
             as: "comments",
           },
