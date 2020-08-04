@@ -73,7 +73,6 @@ export default class UserController {
       }
 
       const user = new User(userFromDB)
-
       res.json({
         auth_token: user.encoded(),
         info: user.toJson(),
