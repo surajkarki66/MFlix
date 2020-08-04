@@ -176,9 +176,7 @@ export default class UsersDAO {
         { email: email },
         {
           $set: {
-            email: preferences.email,
-            name: preferences.name,
-            password: preferences.password,
+            preferences,
           },
         },
       )
