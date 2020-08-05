@@ -5,11 +5,11 @@ module.exports = class MongoEnvironment extends NodeEnvironment {
     if (!this.global.mflixClient) {
       this.global.mflixClient = await MongoClient.connect(
         process.env.MFLIX_DB_URI,
-        // TODO: Connection Pooling
-        // Set the connection pool size to 50 for the testing environment.
-        // TODO: Timeouts
-        // Set the write timeout limit to 2500 milliseconds for the testing environment.
-        { useNewUrlParser: true }
+        {
+          poolSize: 50,
+          wtimeout: 2500,
+        },
+        { useNewUrlParser: true },
       )
       await super.setup()
     }
