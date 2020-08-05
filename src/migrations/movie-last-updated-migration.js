@@ -25,7 +25,7 @@ require("dotenv").config()
       useUnifiedTopology: true,
     })
     const mflix = client.db(process.env.MFLIX_NS)
-    const predicate = {}
+    const predicate = { lastupdated: { $exists: true, $type: "string" } }
     const projection = { lastupdated: 1 }
     const cursor = await mflix
       .collection("movies")
@@ -43,7 +43,6 @@ require("dotenv").config()
       "\x1b[32m",
       `Found ${moviesToMigrate.length} documents to update`,
     )
-    // TODO: Complete the BulkWrite statement below
     const { modifiedCount } = await mflix
       .collection("movies")
       .bulkWrite(moviesToMigrate)
