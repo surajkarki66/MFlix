@@ -30,6 +30,7 @@ export default class CommentsController {
 
       res.json({ status: "success", comments: updatedComments.comments })
     } catch (e) {
+      console.log(e)
       res.status(500).json({ e })
     }
   }

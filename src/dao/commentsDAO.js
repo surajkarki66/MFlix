@@ -1,14 +1,15 @@
 import { ObjectId } from "bson"
 
-let comments
-
 export default class CommentsDAO {
+  static #comments
   static async injectDB(conn) {
-    if (comments) {
+    if (CommentsDAO.#comments) {
       return
     }
     try {
-      comments = await conn.db(process.env.MFLIX_NS).collection("comments")
+      CommentsDAO.#comments = await conn
+        .db(process.env.MFLIX_NS)
+        .collection("comments")
     } catch (e) {
       console.error(`Unable to establish collection handles in userDAO: ${e}`)
     }
@@ -38,8 +39,8 @@ export default class CommentsDAO {
         text: comment,
         date: date,
       }
-
-      return await comments.insertOne(commentDoc)
+      console.log(commentDoc)
+      return await CommentsDAO.#comments.insertOne(commentDoc)
     } catch (e) {
       console.error(`Unable to post comment: ${e}`)
       return { error: e }
@@ -58,7 +59,7 @@ export default class CommentsDAO {
    */
   static async updateComment(commentId, userEmail, text, date) {
     try {
-      const updateResponse = await comments.updateOne(
+      const updateResponse = await CommentsDAO.#comments.updateOne(
         { _id: ObjectId(commentId), email: userEmail },
         { $set: { text: text, date: date } },
       )
@@ -72,7 +73,7 @@ export default class CommentsDAO {
 
   static async deleteComment(commentId, userEmail) {
     try {
-      const deleteResponse = await comments.deleteOne({
+      const deleteResponse = await CommentsDAO.#comments.deleteOne({
         _id: ObjectId(commentId),
         email: userEmail,
       })
@@ -104,9 +105,9 @@ export default class CommentsDAO {
         },
       ]
 
-      const readConcern = comments.readConcern
+      const readConcern = CommentsDAO.#comments.readConcern
 
-      const aggregateResult = await comments.aggregate(pipeline, {
+      const aggregateResult = await CommentsDAO.#comments.aggregate(pipeline, {
         readConcern,
       })
 

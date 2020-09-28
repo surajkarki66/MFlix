@@ -1,18 +1,19 @@
 import { ObjectId } from "bson"
 
-let movies
-let mflix
 const DEFAULT_SORT = [["tomatoes.viewer.numReviews", -1]]
 
 export default class MoviesDAO {
+  static #movies
+  static #mflix
   static async injectDB(conn) {
-    if (movies) {
+    if (MoviesDAO.#movies) {
       return
     }
     try {
-      mflix = await conn.db(process.env.MFLIX_NS)
-      movies = await conn.db(process.env.MFLIX_NS).collection("movies")
-      this.movies = movies // this is only for testing
+      MoviesDAO.#mflix = await conn.db(process.env.MFLIX_NS)
+      MoviesDAO.#movies = await conn
+        .db(process.env.MFLIX_NS)
+        .collection("movies")
     } catch (e) {
       console.error(
         `Unable to establish a collection handle in moviesDAO: ${e}`,
@@ -26,9 +27,9 @@ export default class MoviesDAO {
    * @returns {Promise<ConfigurationResult>} An object with configuration details.
    */
   static async getConfiguration() {
-    const roleInfo = await mflix.command({ connectionStatus: 1 })
+    const roleInfo = await MoviesDAO.#mflix.command({ connectionStatus: 1 })
     const authInfo = roleInfo.authInfo.authenticatedUserRoles[0]
-    const { poolSize, wtimeout } = movies.s.db.serverConfig.s.options
+    const { poolSize, wtimeout } = MoviesDAO.#movies.s.db.serverConfig.s.options
     let response = {
       poolSize,
       wtimeout,
@@ -46,7 +47,7 @@ export default class MoviesDAO {
   static async getMoviesByCountry(countries) {
     let cursor
     try {
-      cursor = await movies.find(
+      cursor = await MoviesDAO.#movies.find(
         { countries: { $in: countries } },
         { projection: { title: 1 } },
       )
@@ -168,8 +169,12 @@ export default class MoviesDAO {
     ]
 
     try {
-      const results = await (await movies.aggregate(queryPipeline)).next()
-      const count = await (await movies.aggregate(countingPipeline)).next()
+      const results = await (
+        await MoviesDAO.#movies.aggregate(queryPipeline)
+      ).next()
+      const count = await (
+        await MoviesDAO.#movies.aggregate(countingPipeline)
+      ).next()
       return {
         ...results,
         ...count,
@@ -208,7 +213,7 @@ export default class MoviesDAO {
     let { query = {}, project = {}, sort = DEFAULT_SORT } = queryParams
     let cursor
     try {
-      cursor = await movies
+      cursor = await MoviesDAO.#movies
         .find(query)
         .project(project)
         .sort(sort)
@@ -220,7 +225,8 @@ export default class MoviesDAO {
     const displayCursor = cursor.skip(page * moviesPerPage).limit(moviesPerPage)
     try {
       const moviesList = await displayCursor.toArray()
-      const totalNumMovies = page === 0 ? await movies.countDocuments(query) : 0
+      const totalNumMovies =
+        page === 0 ? await MoviesDAO.#movies.countDocuments(query) : 0
       return { moviesList, totalNumMovies }
     } catch (e) {
       console.error(
@@ -262,7 +268,7 @@ export default class MoviesDAO {
           },
         },
       ]
-      return await movies.aggregate(pipeline).next()
+      return await MoviesDAO.#movies.aggregate(pipeline).next()
     } catch (e) {
       // here's how the InvalidId error is identified and handled
       if (

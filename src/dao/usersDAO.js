@@ -1,14 +1,15 @@
-let users
-let sessions
-
 export default class UsersDAO {
+  static #sessions
+  static #users
   static async injectDB(conn) {
-    if (users && sessions) {
+    if (UsersDAO.#users && UsersDAO.#sessions) {
       return
     }
     try {
-      users = await conn.db(process.env.MFLIX_NS).collection("users")
-      sessions = await conn.db(process.env.MFLIX_NS).collection("sessions")
+      UsersDAO.#users = await conn.db(process.env.MFLIX_NS).collection("users")
+      UsersDAO.#sessions = await conn
+        .db(process.env.MFLIX_NS)
+        .collection("sessions")
     } catch (e) {
       console.error(`Unable to establish collection handles in userDAO: ${e}`)
     }
@@ -20,7 +21,7 @@ export default class UsersDAO {
    * @returns {Object | null} Returns either a single user or nothing
    */
   static async getUser(email) {
-    return await users.findOne({ email: email })
+    return await UsersDAO.#users.findOne({ email: email })
   }
 
   /**
@@ -30,7 +31,7 @@ export default class UsersDAO {
    */
   static async addUser(userInfo) {
     try {
-      await users.insertOne(
+      await UsersDAO.#users.insertOne(
         {
           name: userInfo.name,
           email: userInfo.email,
@@ -56,7 +57,7 @@ export default class UsersDAO {
    */
   static async loginUser(email, jwt) {
     try {
-      await sessions.updateOne(
+      await UsersDAO.#sessions.updateOne(
         { user_id: email },
         { $set: { jwt } },
         { upsert: true },
@@ -75,7 +76,7 @@ export default class UsersDAO {
    */
   static async logoutUser(email) {
     try {
-      await sessions.deleteOne({ user_id: email })
+      await UsersDAO.#sessions.deleteOne({ user_id: email })
       return { success: true }
     } catch (e) {
       console.error(`Error occurred while logging out user, ${e}`)
@@ -91,7 +92,7 @@ export default class UsersDAO {
    */
   static async getUserSession(email) {
     try {
-      return sessions.findOne({ user_id: email })
+      return UsersDAO.#sessions.findOne({ user_id: email })
     } catch (e) {
       console.error(`Error occurred while retrieving user session, ${e}`)
       return null
@@ -105,8 +106,8 @@ export default class UsersDAO {
    */
   static async deleteUser(email) {
     try {
-      await users.deleteOne({ email })
-      await sessions.deleteOne({ user_id: email })
+      await UsersDAO.#users.deleteOne({ email })
+      await UsersDAO.#sessions.deleteOne({ user_id: email })
       if (!(await this.getUser(email)) && !(await this.getUserSession(email))) {
         return { success: true }
       } else {
@@ -130,7 +131,7 @@ export default class UsersDAO {
     try {
       preferences = preferences || {}
 
-      const updateResponse = await users.updateOne(
+      const updateResponse = await UsersDAO.#users.updateOne(
         { email: email },
         {
           $set: {
@@ -162,7 +163,7 @@ export default class UsersDAO {
 
   static async makeAdmin(email) {
     try {
-      const updateResponse = users.updateOne(
+      const updateResponse = UsersDAO.#users.updateOne(
         { email },
         { $set: { isAdmin: true } },
       )
